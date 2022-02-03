@@ -1,0 +1,22 @@
+{% extends 'main.html' %}
+
+{%block content%}
+<h1> Home be Here (at Base)</h1>
+
+<div>
+
+    <a href='{% url "create-issue"%}'> SUBMIT AN ISSUE</a>
+
+    <div>
+        {% for issue in issues %}
+
+        <div>
+            <h4>{{issue.user.username}} in Project {{issue.project.title}}</h4>
+            <h5>{{issue.id}} -- <a href='{% url "issue" issue.id %}'>{{issue.title}}</a> </h5>
+            <br>
+        </div>
+
+        {%endfor%}
+    </div>
+</div>
+{%endblock%}
