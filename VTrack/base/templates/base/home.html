@@ -27,6 +27,8 @@
         <a href='{% url "create-project"%}'> CREATE A NEW PROJECT</a>
         <a href='{% url "create-issue"%}'> SUBMIT AN ISSUE</a>
 
+        <h5>Open: {{counts.0}} | Closed: {{counts.1}} | Overdue: {{counts.2}} | Due Now: {{counts.3}} | Due in 7 Days: {{counts.4}}</h5>
+
         <div>
             {% for issue in issues %}
 

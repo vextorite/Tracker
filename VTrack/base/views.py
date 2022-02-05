@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.db.models import Q
 from .models import Issue, Project
 from .forms import Issue_Form, Project_Form
+from datetime import date
 
 # Create your views here.
 
@@ -13,7 +14,29 @@ def home(request):
         Q(project__title__icontains=query)|
         Q(title__icontains=query))       #accounting for wildcard searches
     projects = Project.objects.all()
-    return render(request, 'base/home.html', context={'issues':logged_issues, 'projects': projects})
+    issues = Issue.objects.all()
+    for issue in issues:                #There's probably a better way to update this dynamically
+        now = date.today()
+        if (issue.return_date - now).days<1:
+            if(issue.state == 'Closed'):
+                continue
+            else:
+                issue.state = 'Overdue'
+                issue.save()
+        elif (issue.return_date - now).days==0:
+            issue.state = 'Due Now'
+            issue.save()
+        elif (issue.return_date - now).days>1 and (issue.return_date - now).days<=7:
+            issue.state = 'Due Later'
+            issue.save()
+    counts = [
+        logged_issues.filter(state='Open').count()+logged_issues.filter(state='Due Now').count()+logged_issues.filter(state='Due Later').count(), 
+        logged_issues.filter(state='Closed').count(),
+        logged_issues.filter(state='Overdue').count(),
+        logged_issues.filter(state='Due Now').count(),
+        logged_issues.filter(state='Due Later').count()]
+        
+    return render(request, 'base/home.html', context={'issues':logged_issues, 'projects': projects, 'counts': counts})
 
 def issue(request, pk):
     issue = Issue.objects.get(id=pk)
