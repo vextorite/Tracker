@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
+from django.db.models import Q
 from .models import Issue, Project
 from .forms import Issue_Form, Project_Form
 
@@ -8,7 +9,9 @@ from .forms import Issue_Form, Project_Form
 
 def home(request):
     query = request.GET.get('q') if request.GET.get('q') != None else ''        #setup for search by project
-    logged_issues = Issue.objects.filter(project__title__icontains=query)       #accounting for wildcard searches
+    logged_issues = Issue.objects.filter(
+        Q(project__title__icontains=query)|
+        Q(title__icontains=query))       #accounting for wildcard searches
     projects = Project.objects.all()
     return render(request, 'base/home.html', context={'issues':logged_issues, 'projects': projects})
 
