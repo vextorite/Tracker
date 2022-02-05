@@ -1,5 +1,8 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from .models import Issue, Project
 from .forms import Issue_Form, Project_Form
@@ -7,7 +10,28 @@ from datetime import date
 
 # Create your views here.
 
+def login_view(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            pass
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('home')
+        else:
+            messages.error(request, 'Incorrect Username or Password')
 
+    return render(request, 'base/reg_login.html')
+
+def logout_view(request):
+    logout(request)
+    return redirect('home')
+
+@login_required(login_url='login')
 def home(request):
     query = request.GET.get('q') if request.GET.get('q') != None else ''        #setup for search by project
     logged_issues = Issue.objects.filter(
@@ -38,10 +62,12 @@ def home(request):
         
     return render(request, 'base/home.html', context={'issues':logged_issues, 'projects': projects, 'counts': counts})
 
+@login_required(login_url='login')
 def issue(request, pk):
     issue = Issue.objects.get(id=pk)
     return render(request, 'base/issue.html', context={'issue':issue})
 
+@login_required(login_url='login')
 def create_issue(request):
     form = Issue_Form()
     if request.method == 'POST':
@@ -51,6 +77,7 @@ def create_issue(request):
             return redirect('home')
     return render(request, 'base/issue_form.html', context={'form':form})
 
+@login_required(login_url='login')
 def update_issue(request, pk):
     issue = Issue.objects.get(pk=pk)
     form = Issue_Form(instance=issue)
@@ -62,6 +89,7 @@ def update_issue(request, pk):
             return redirect('home')
     return render(request, 'base/issue_form.html', context={'form':form})
 
+@login_required(login_url='login')
 def create_project(request):
     form = Project_Form
     if request.method == 'POST':
@@ -71,6 +99,7 @@ def create_project(request):
             return redirect('home')
     return render(request, 'base/project_form.html', context={'form':form})
 
+@login_required(login_url='login')
 def update_project(request, pk):
     project = Project.objects.get(pk=pk)
     form = Project_Form(instance=project)

@@ -33,9 +33,12 @@
             {% for issue in issues %}
 
             <div>
+                
                 <h4>{{issue.user.username}} in Project {{issue.project.title}}</h4>
                 <h5>{{issue.id}} -- <a href='{% url "issue" issue.id %}'>{{issue.title}}</a> </h5>
+                {%if request.user in issue.project.members.all%}
                 <a href='{%url "update-issue" issue.id%}'>EDIT</a>
+                {%endif%}
                 <hr>
             </div>
 
