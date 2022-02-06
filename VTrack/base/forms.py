@@ -4,7 +4,7 @@ from .models import Issue, Project
 class Issue_Form(ModelForm):
     class Meta:
         model = Issue
-        fields = '__all__'
+        fields = ['title', 'description', 'return_date', 'priority', 'state', 'project']
 
 class Project_Form(ModelForm):
     class Meta:

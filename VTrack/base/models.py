@@ -33,7 +33,17 @@ class Issue(models.Model):
     priority = models.CharField(max_length=20, choices=PRIORITY_CHOICES, default='Low')
     state = models.CharField(max_length=20, choices=STATE_CHOICES, default='Open')
     project = models.ForeignKey(Project, default=None ,on_delete=models.CASCADE)
+    participants = models.ManyToManyField(User, related_name='participants', blank=True)
 
     def __str__(self):
         return self.title
 
+class Comment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    issue = models.ForeignKey(Issue, on_delete=models.CASCADE)
+    body = models.TextField()
+    dateCreated = models.DateTimeField(auto_now_add=True)
+    dateModified = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.body[0:40]

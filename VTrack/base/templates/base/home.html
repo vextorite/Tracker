@@ -5,7 +5,7 @@
 <style>
     .home-container {
         display: grid;
-        grid-template-columns: 1fr 3fr;
+        grid-template-columns: 1fr 3fr 1fr;
     }
 </style>
 
@@ -45,7 +45,20 @@
             {%endfor%}
         </div>
     </div>
-
+<div>
+    <h3>Recent Activity</h3>
+    <hr>
+    {%for comment in comments%}
+        <div>
+            <small>
+                {{comment.user.username}}  {{comment.dateCreated|timesince}}
+            </small> <br>
+            <small>
+                Added a comment to issue: {{comment}}
+            </small>
+        </div>
+    {%endfor%}
+</div>
     
 </div>
 {%endblock%}
